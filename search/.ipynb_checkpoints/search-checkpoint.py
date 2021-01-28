@@ -93,31 +93,45 @@ def depthFirstSearch(problem):
 #     print("SOmesuccesor",problem.getSuccessors((5,4)))
 
     from game import Directions
-
-
-    if problem.isGoalState(problem.getStartState()):
+    
+    start = problem.getStartState()
+#If you already are in the goal:
+    if problem.isGoalState(start):
         return 
 
 
+#Creating the list where we keep the visited nodes
     visited = []
+#where_to_go next, it is a stack so it uses a LIFO order
     w_t_g = util.Stack()
+#Initialize dictionary to draw the path backwards
     parent_list = {}
-    start = problem.getStartState()
+    parent_list[start] = None
 
-    
+#Adding start to the first where to go node
     w_t_g.push(start)
     print('start', start)
 
-    parent_list[start] = None
-    print(parent_list)
+#Initialize list for the backwards path
     path_inv=[]
 
+    
+#While there are still nodes to go to
     while w_t_g.isEmpty != True:
+        
+    #Take last node that was pushed into stack
         parent = w_t_g.pop()
         print('parent', parent)
+        
+    #If this node has already been visited we skip the other orders
         if parent in visited:
             continue
+            
+    #If we haven't visited the node we check if it is a goal, we add it to visited list
+    #  and we add the successors in the w_t_g stack, keeping track of the path with 
+    #  the dictionary
         else:
+            #Check if it is goal
             if problem.isGoalState(parent) == True:
                 goal = parent
                 print('goal!')
@@ -128,19 +142,28 @@ def depthFirstSearch(problem):
                     path_inv.append(prev_state)
                     goal= prev_state
                 break
+            
+            #Add to visited
             visited.append(parent)
+            
+            #keep track of path and add nodes to w_t_g
             for successor in problem.getSuccessors(parent):
                 print('successor',successor)
                 w_t_g.push(successor[0])
                 parent_list[successor[0]] = parent
 
+     
+    #Finding the real path (inverse of found path)
     path = path_inv.reverse()
     print('path', path)
+    
+    #Describe directions
     s = Directions.SOUTH
     w = Directions.WEST
     n = Directions.NORTH
     e = Directions.EAST
     
+    #Check what are the actions to do that path
     for i in range(len(path)-1):
         a=path[i]
         b=path[i+1]
@@ -162,7 +185,7 @@ def depthFirstSearch(problem):
     
     return path
         
-
+# what is this?? nomes un print no?
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
