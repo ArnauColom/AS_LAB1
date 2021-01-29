@@ -113,7 +113,7 @@ def depthFirstSearch(problem):
     print('start', start)
 
 #Initialize list for the backwards path
-    path_inv=[]
+    path=[]
 
     
 #While there are still nodes to go to
@@ -121,7 +121,7 @@ def depthFirstSearch(problem):
         
     #Take last node that was pushed into stack
         parent = w_t_g.pop()
-        print('parent', parent)
+        
         
     #If this node has already been visited we skip the other orders
         if parent in visited:
@@ -135,27 +135,33 @@ def depthFirstSearch(problem):
             if problem.isGoalState(parent) == True:
                 goal = parent
                 print('goal!')
-                path_inv.append(goal)
+                path.append(goal)
                 while goal != None:
-                    print('iter',parent_list)
+#                     print('iter',parent_list)
                     prev_state = parent_list[goal]
-                    path_inv.append(prev_state)
+                    path.append(prev_state)
                     goal= prev_state
                 break
             
             #Add to visited
+            print('visiting', parent)
             visited.append(parent)
             
             #keep track of path and add nodes to w_t_g
             for successor in problem.getSuccessors(parent):
-                print('successor',successor)
                 w_t_g.push(successor[0])
-                parent_list[successor[0]] = parent
+                
+                if successor[0] not in parent_list.keys():
+                    parent_list[successor[0]] = parent
+                    print(parent_list)
 
      
     #Finding the real path (inverse of found path)
-    path = path_inv.reverse()
+    print('inverse path',path)
+    path.reverse()
+    path.remove(None)
     print('path', path)
+    
     
     #Describe directions
     s = Directions.SOUTH
@@ -163,27 +169,32 @@ def depthFirstSearch(problem):
     n = Directions.NORTH
     e = Directions.EAST
     
+    actions=[]
+    
     #Check what are the actions to do that path
     for i in range(len(path)-1):
         a=path[i]
         b=path[i+1]
         c= (b[0]-a[0],b[1]-a[1])
         print(c)
-        if c[0]>0:
-            print('s')
-            path.append(s)
-        if c[0]<0:
-            print('n')
-            path.append(n)
         if c[1]>0:
-            print('e')
-            path.append(e)
+            print('n')
+            actions.append(n)
         if c[1]<0:
+            print('s')
+            actions.append(s)
+        if c[0]>0:
+            print('e')
+            actions.append(e)
+        if c[0]<0:
             print('w')
-            path.append(w)
-    print(path)
+            actions.append(w)
+    print(actions)
     
-    return path
+    return actions
+
+#So it moves slowly
+# python pacman.py -l tinyMaze -p SearchAgent --frameTime=2
         
 # what is this?? nomes un print no?
     util.raiseNotDefined()
