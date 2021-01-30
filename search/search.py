@@ -170,12 +170,16 @@ def depthFirstSearch(problem):
     e = Directions.EAST
     
     actions=[]
-    
+    #util.raiseNotDefined()
     #Check what are the actions to do that path
     for i in range(len(path)-1):
         a=path[i]
         b=path[i+1]
-        c= (b[0]-a[0],b[1]-a[1])
+        print('patata')
+        print(a)
+        a_0, a_1 = a
+        b_0, b_1 = b
+        c= (b_0-a_0,b_1-a_0)
         print(c)
         if c[1]>0:
             print('n')
@@ -219,7 +223,49 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    ##python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+
+    start = problem.getStartState()
+    #If you already are in the goal:
+    if problem.isGoalState(start):
+        return 
+
+    # G is the distace from start to node n 
+    # H heuristic distance from node to end
+    # F total cost H+G
+
+    #open list nodes to be visited
+    open_l = util.PriorityQueue()
+    g = 0
+    h = heuristic(start,problem)
+    start_state = (start, g,h,[])
+    f = g+h
+    open_l.update(start_state,f)
+
+    #closed list nodes visited
+    closed_l = []
+
+    while(not open_l.isEmpty()):
+        (curr, g, h, path) = open_l.pop()
+
+        if problem.isGoalState(curr):
+            return path
+
+        if curr in closed_l:
+            continue
+        closed_l.append(curr)
+        for suc, action, c in problem.getSuccessors(curr):
+            if suc in closed_l:
+                continue                
+            next_cost = g + c
+            h = heuristic(suc, problem)
+            open_l.update((suc, next_cost, h, path + [action]), next_cost + h)
+
+
+
     util.raiseNotDefined()
+
+
 
 
 # Abbreviations

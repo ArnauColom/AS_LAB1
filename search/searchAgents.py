@@ -41,6 +41,7 @@ from game import Actions
 import util
 import time
 import search
+import pdb
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -282,13 +283,17 @@ class CornersProblem(search.SearchProblem):
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
         self.corners = ((1,1), (1,top), (right, 1), (right, top))
+        print(self.startingPosition)
+        print(self.corners)
+        #pdb.set_trace()
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
-        # in initializing the problem
+        # in initializing the problem. **NOT NECESARY
         "*** YOUR CODE HERE ***"
+        self.number_of_corners = 4
 
     def getStartState(self):
         """
@@ -296,14 +301,20 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        corners_visited = []
+
+        return (self.startingPosition, corners_visited)
+        #util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        state_corn = state[1]
+        number_of_corners_found =  len(state_corn)
+        return number_of_corners_found == 4
+        #util.raiseNotDefined()
 
     def getSuccessors(self, state):
         """
@@ -325,7 +336,38 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
+        ##CODE COPIED FROM THE SEARCH PROBLEM--------------------------------------
+            # x,y = state
+            # dx, dy = Actions.directionToVector(action)
+            # nextx, nexty = int(x + dx), int(y + dy)
+            # if not self.walls[nextx][nexty]:
+            #     nextState = (nextx, nexty)
+            #     cost = self.costFn(nextState)
+            #     successors.append( ( nextState, action, cost) )        
+
+        ##----------------------------------------------------------------
             "*** YOUR CODE HERE ***"
+            curr_x, curr_y = state[0]
+            corners_found = state[1]
+            #pdb.set_trace()
+            targ_corners = self.corners
+            cost = 1
+
+
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(curr_x + dx), int(curr_y + dy)
+            hitsWall = self.walls[nextx][nexty]
+
+            if hitsWall:
+                continue
+
+            next_pos = (nextx, nexty)
+            if next_pos in targ_corners and next_pos not in corners_found:
+                new_c_f = corners_found + [(next_pos)]
+                successors.append(((next_pos,new_c_f) , action, cost))  
+            else:
+                successors.append(((next_pos,corners_found) , action, cost))  
+
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -359,9 +401,26 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
+    import math  
+
+    #select the corners that havent been visited
+    corners_unvisited = []
+    
+    for c in corners:
+        if c not in state[1]:
+            corners_unvisited.append(c)
+
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    h_distance = 0
+    x , y = state[0]
+    for i in corners_unvisited:
+        x_c , y_c = i
+        d = round(math.sqrt(pow(x-x_c,2) + pow(y-y_c,2)))#euclidead distance
+        h_distance += d
+        
+
+    return h_distance # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -453,10 +512,54 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
 
+
+
+    "*** YOUR CODE HERE ***"
+    import math  
+
+    position, foodGrid = state
+    # #pdb.set_trace()
+    h_distance = 0
+
+
+    x, y = position
+
+    for i in range(foodGrid.width):
+        for j in range(foodGrid.height):
+            if foodGrid[i][j]:
+                d = round(math.sqrt(pow(x-i,2) + pow(y-j,2)))#euclidead distance
+                h_distance += d
+
+
+    return h_distance    
+
+    #h_distance = 0
+
+
+    # x, y = position
+    # d = []
+    # final_d_h = 0
+    # for i in range(foodGrid.width):
+    #     for j in range(foodGrid.height):
+    #         if foodGrid[i][j]:
+    #             d.append(round(math.sqrt(pow(x-i,2) + pow(y-j,2)))) #euclidead distance
+    #             #h_distance += d
+    # d.sort()
+    # count = 1
+    # for i in d:
+    #     final_d_h = final_d_h + i*((1-pow(0.5,1/count))*2)
+    #     count = count+1
+
+
+
+
+    # return final_d_h  
+
+
+
+
+   
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
