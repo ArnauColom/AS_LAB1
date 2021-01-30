@@ -87,10 +87,7 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-#     print("Start:", problem.getStartState())
-#     print("Start's successors:", problem.getSuccessors(start)[0][0])
-#     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-#     print("SOmesuccesor",problem.getSuccessors((5,4)))
+
 
     from game import Directions
     
@@ -106,11 +103,11 @@ def depthFirstSearch(problem):
     w_t_g = util.Stack()
 #Initialize dictionary to draw the path backwards
     parent_list = {}
-    parent_list[start] = None
+    parent_list[start] = (None,None)
 
 #Adding start to the first where to go node
     w_t_g.push(start)
-    print('start', start)
+    #print('start', start)
 
 #Initialize list for the backwards path
     path=[]
@@ -134,17 +131,17 @@ def depthFirstSearch(problem):
             #Check if it is goal
             if problem.isGoalState(parent) == True:
                 goal = parent
-                print('goal!')
-                path.append(goal)
+                #print('goal!')
+                #path.append(goal)
                 while goal != None:
 #                     print('iter',parent_list)
-                    prev_state = parent_list[goal]
-                    path.append(prev_state)
+                    (prev_state,act) = parent_list[goal]
+                    path.append(act)
                     goal= prev_state
                 break
             
             #Add to visited
-            print('visiting', parent)
+            #print('visiting', parent)
             visited.append(parent)
             
             #keep track of path and add nodes to w_t_g
@@ -152,46 +149,47 @@ def depthFirstSearch(problem):
                 w_t_g.push(successor[0])
                 
                 if successor[0] not in parent_list.keys():
-                    parent_list[successor[0]] = parent
-                    print(parent_list)
+                    action = successor[1]
+                    parent_list[successor[0]] = (parent,action)
+                    #print(parent_list)
 
      
     #Finding the real path (inverse of found path)
-    print('inverse path',path)
+    #print('inverse path',path)
     path.reverse()
     path.remove(None)
-    print('path', path)
+    #print('path', path)
     
     
     #Describe directions
-    s = Directions.SOUTH
-    w = Directions.WEST
-    n = Directions.NORTH
-    e = Directions.EAST
+    #s = Directions.SOUTH
+    #w = Directions.WEST
+    #n = Directions.NORTH
+    #e = Directions.EAST
     
-    actions=[]
+    #actions=[]
     
     #Check what are the actions to do that path
-    for i in range(len(path)-1):
-        a=path[i]
-        b=path[i+1]
-        c= (b[0]-a[0],b[1]-a[1])
-        print(c)
-        if c[1]>0:
-            print('n')
-            actions.append(n)
-        if c[1]<0:
-            print('s')
-            actions.append(s)
-        if c[0]>0:
-            print('e')
-            actions.append(e)
-        if c[0]<0:
-            print('w')
-            actions.append(w)
-    print(actions)
+    #for i in range(len(path)-1):
+    #    a=path[i]
+    #    b=path[i+1]
+    #    c= (b[0]-a[0],b[1]-a[1])
+    #    print(c)
+    #    if c[1]>0:
+    #        print('n')
+    #        actions.append(n)
+    #    if c[1]<0:
+    #        print('s')
+    #        actions.append(s)
+    #    if c[0]>0:
+    #        print('e')
+    #        actions.append(e)
+    #    if c[0]<0:
+    #        print('w')
+    #        actions.append(w)
+    #print(actions)
     
-    return actions
+    return path
 
 #So it moves slowly
 # python pacman.py -l tinyMaze -p SearchAgent --frameTime=2
@@ -202,11 +200,162 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    
+    from game import Directions
+    
+    start = problem.getStartState()
+#If you already are in the goal:
+    if problem.isGoalState(start):
+        return 
+
+
+#Creating the list where we keep the visited nodes
+    visited = []
+#where_to_go next, it is a stack so it uses a FIFO order
+    w_t_g = util.Queue()
+#Initialize dictionary to draw the path backwards
+    parent_list = {}
+    parent_list[start] = (None,None)
+
+#Adding start to the first where to go node
+    w_t_g.push(start)
+    #print('start', start)
+
+#Initialize list for the backwards path
+    path=[]
+
+    
+#While there are still nodes to go to
+    while w_t_g.isEmpty != True:
+        
+    #Take last node that was pushed into stack
+        parent = w_t_g.pop()
+        
+        
+    #If this node has already been visited we skip the other orders
+        if parent in visited:
+            continue
+            
+    #If we haven't visited the node we check if it is a goal, we add it to visited list
+    #  and we add the successors in the w_t_g stack, keeping track of the path with 
+    #  the dictionary
+        else:
+            #Check if it is goal
+            if problem.isGoalState(parent) == True:
+                goal = parent
+                #print('goal!')
+                #path.append(goal)
+                while goal != None:
+#                     print('iter',parent_list)
+                    (prev_state,act) = parent_list[goal]
+                    path.append(act)
+                    goal= prev_state
+                break
+            
+            #Add to visited
+            #print('visiting', parent)
+            visited.append(parent)
+            
+            #keep track of path and add nodes to w_t_g
+            for successor in problem.getSuccessors(parent):
+                w_t_g.push(successor[0])
+                
+                if successor[0] not in parent_list.keys():
+                    action = successor[1]
+                    parent_list[successor[0]] = (parent,action)
+                    #print(parent_list)
+
+     
+    #Finding the real path (inverse of found path)
+    #print('inverse path',path)
+    path.reverse()
+    path.remove(None)
+
+    return path
+
+        
+# what is this?? nomes un print no?
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    
+    from game import Directions
+    
+    start = (problem.getStartState(),0)
+#If you already are in the goal:
+    if problem.isGoalState(start[0]):
+        return 
+
+
+#Creating the list where we keep the visited nodes
+    visited = []
+#where_to_go next, it is a priority queue so it uses a cost order
+    w_t_g = util.PriorityQueue()
+#Initialize dictionary to draw the path backwards
+    parent_list = {}
+    parent_list[start[0]] = (None,None)
+
+#Adding start to the first where to go node
+    w_t_g.update(start,0)
+    #print('start', start)
+
+#Initialize list for the backwards path
+    path=[]
+
+    
+#While there are still nodes to go to
+    while w_t_g.isEmpty != True:
+        
+    #Take last node that was pushed into stack
+        (parent,cost) = w_t_g.pop()
+
+    #Check if it is goal
+        if problem.isGoalState(parent) == True:
+            goal = parent
+            #print('goal!')
+            #path.append(goal)
+            while goal != None:
+#               print('iter',parent_list)
+                (prev_state,act) = parent_list[goal]
+                path.append(act)
+                goal= prev_state
+            break
+
+    #If this node has already been visited we skip the other orders
+        if parent in visited:
+            continue
+            
+    #If we haven't visited the node we check if it is a goal, we add it to visited list
+    #  and we add the successors in the w_t_g stack, keeping track of the path with 
+    #  the dictionary
+        else:
+            
+            #Add to visited
+            #print('visiting', parent)
+            visited.append(parent)
+            
+            #keep track of path and add nodes to w_t_g
+            for successor in problem.getSuccessors(parent):
+                cost_s = cost + successor[2]
+                successor_state = (successor[0],cost_s)
+                w_t_g.update(successor_state ,cost_s)
+                
+                if successor[0] not in parent_list.keys():
+                    action = successor[1]
+                    parent_list[successor[0]] = (parent,action)
+                    #print(parent_list)
+
+    #Finding the real path (inverse of found path)
+    #print('inverse path',path)
+    path.reverse()
+    path.remove(None)
+    
+    return path
+
+        
+# what is this?? nomes un print no?
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -219,7 +368,49 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    ##python pacman.py -l bigMaze -z .5 -p SearchAgent -a fn=astar,heuristic=manhattanHeuristic
+
+    start = problem.getStartState()
+    #If you already are in the goal:
+    if problem.isGoalState(start):
+        return 
+
+    # G is the distace from start to node n 
+    # H heuristic distance from node to end
+    # F total cost H+G
+
+    #open list nodes to be visited
+    open_l = util.PriorityQueue()
+    g = 0
+    h = heuristic(start,problem)
+    start_state = (start, g,h,[])
+    f = g+h
+    open_l.update(start_state,f)
+
+    #closed list nodes visited
+    closed_l = []
+
+    while(not open_l.isEmpty()):
+        (curr, g, h, path) = open_l.pop()
+
+        if problem.isGoalState(curr):
+            return path
+
+        if curr in closed_l:
+            continue
+        closed_l.append(curr)
+        for suc, action, c in problem.getSuccessors(curr):
+            if suc in closed_l:
+                continue                
+            next_cost = g + c
+            h = heuristic(suc, problem)
+            open_l.update((suc, next_cost, h, path + [action]), next_cost + h)
+
+
+
     util.raiseNotDefined()
+
+
 
 
 # Abbreviations
