@@ -400,8 +400,7 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
     """
     corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-    import math  
+    walls = problem.walls # These are the walls of the maze, as a Grid (game.py) 
 
     #select the corners that havent been visited
     corners_unvisited = []
@@ -409,18 +408,24 @@ def cornersHeuristic(state, problem):
     for c in corners:
         if c not in state[1]:
             corners_unvisited.append(c)
+    #print('c',corners_unvisited)
 
 
     "*** YOUR CODE HERE ***"
-    h_distance = 0
-    x , y = state[0]
-    for i in corners_unvisited:
-        x_c , y_c = i
-        d = round(math.sqrt(pow(x-x_c,2) + pow(y-y_c,2)))#euclidead distance
-        h_distance += d
-        
+    h=0
+    ideal_pos = state[0]
+    while len(corners_unvisited)>0:
+        h_c = []
+        x,y = ideal_pos
+        for i in corners_unvisited:
+            x_c , y_c = i
+            h_c.append(abs(x-x_c) + abs(y-y_c))#manhattan distance for each corner
+        h = h+ (min(h_c))
+        ind = h_c.index(min(h_c))
+        ideal_pos = corners_unvisited[ind]
+        del corners_unvisited[ind]
 
-    return h_distance # Default to trivial solution
+    return h 
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -514,25 +519,56 @@ def foodHeuristic(state, problem):
     """
 
 
-
     "*** YOUR CODE HERE ***"
-    import math  
-
+    
     position, foodGrid = state
+    food_coord = foodGrid.asList() # These are the food coordinates
+    walls = problem.walls # These are the walls of the maze, as a Grid (game.py) 
+
+    #select the corners that havent been visited
+    food_unvisited = food_coord.copy()
+
+
+    if len(food_coord) == 0:
+        return 0
+    
+    h=0
+    ideal_pos = state[0]
+    while len(food_unvisited)>0:
+        h_c = []
+        x,y = ideal_pos
+        for i in food_unvisited:
+            x_c , y_c = i
+            h_c.append(mazeDistance(ideal_pos, i, problem.startingGameState))#maze distance for each corner
+        h = h+ (max(h_c))
+        ind = h_c.index(max(h_c))
+        ideal_pos = food_unvisited[ind]
+        del food_unvisited[ind]
+
+        
+    return h/len(food_coord) 
+    
+    
+    
+    
+#    import math  
+
+#    position, foodGrid = state
     # #pdb.set_trace()
-    h_distance = 0
+#    food_coord = foodGrid.asList()
+#    h_distance = 0
 
 
-    x, y = position
+#    x, y = position
 
-    for i in range(foodGrid.width):
-        for j in range(foodGrid.height):
-            if foodGrid[i][j]:
-                d = round(math.sqrt(pow(x-i,2) + pow(y-j,2)))#euclidead distance
-                h_distance += d
+#    for i in range(foodGrid.width):
+#        for j in range(foodGrid.height):
+#            if foodGrid[i][j]:
+#                d = round(math.sqrt(pow(x-i,2) + pow(y-j,2)))#euclidead distance
+#                h_distance += d
 
 
-    return h_distance    
+#    return h_distance    
 
     #h_distance = 0
 
@@ -589,6 +625,14 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+
+        #pdb.set_trace()
+
+        #Try with mazedistance and mabhatan distance
+
+        path = search.breadthFirstSearch(problem)#Search for the closest nodes
+        return path
+
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -625,6 +669,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
+        #Return true if the state is on the food position
+        return self.food[x][y]
         util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
