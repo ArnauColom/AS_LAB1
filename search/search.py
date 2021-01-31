@@ -287,7 +287,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     while open_l.isEmpty() != True:
         (curr, g, h, path) = open_l.pop()
-
+        #Return path when goal reached
         if problem.isGoalState(curr):
             return path
 
@@ -295,6 +295,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             continue
             
         visited.append(curr)
+        #For each succesor compute its cost and heuristic and addid to the open queue. 
         for successor, action, cost in problem.getSuccessors(curr):
             if successor in visited:
                 continue                

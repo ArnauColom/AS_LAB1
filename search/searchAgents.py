@@ -293,7 +293,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem. **NOT NECESARY
         "*** YOUR CODE HERE ***"
-        self.number_of_corners = 4
+        self.number_of_corners = 4#useless
 
     def getStartState(self):
         """
@@ -301,7 +301,8 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        corners_visited = []
+        corners_visited = []#initialized a list
+        #The list will store the corners that have been visited
 
         return (self.startingPosition, corners_visited)
         #util.raiseNotDefined()
@@ -311,8 +312,10 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        state_corn = state[1]
-        number_of_corners_found =  len(state_corn)
+        state_corn = state[1]#Extract the list of visited corners
+        number_of_corners_found =  len(state_corn)#Cpmute the number of visited numbers
+        #if the number of visited nodes is the same as the number of corners that need to be visited
+        #Return true, else false
         return number_of_corners_found == 4
         #util.raiseNotDefined()
 
@@ -326,8 +329,9 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
+        #Create an a rray of possible 
         successors = []
+        #Iterate over all diretions
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
@@ -347,24 +351,27 @@ class CornersProblem(search.SearchProblem):
 
         ##----------------------------------------------------------------
             "*** YOUR CODE HERE ***"
-            curr_x, curr_y = state[0]
-            corners_found = state[1]
+            curr_x, curr_y = state[0]#Select the current position
+            corners_found = state[1]#Setect the corners that have been visited
             #pdb.set_trace()
-            targ_corners = self.corners
-            cost = 1
+            targ_corners = self.corners#Target of total corners
+            cost = 1 # Cost per action
 
 
-            dx, dy = Actions.directionToVector(action)
-            nextx, nexty = int(curr_x + dx), int(curr_y + dy)
-            hitsWall = self.walls[nextx][nexty]
+            dx, dy = Actions.directionToVector(action)#Direction to vector
+            nextx, nexty = int(curr_x + dx), int(curr_y + dy) #Clmpute next x and y
+            hitsWall = self.walls[nextx][nexty] #Know if the new position is a wall
 
-            if hitsWall:
+            if hitsWall:##If the new position is a wall we jump into the next for(loop) iteration
                 continue
 
-            next_pos = (nextx, nexty)
-            if next_pos in targ_corners and next_pos not in corners_found:
+            next_pos = (nextx, nexty)#New position
+            #If new position is a corner that has never been visited we update the visited corners list state[1] 
+            #The we store the successor
+            if next_pos in targ_corners and next_pos not in corners_found:#If new position 
                 new_c_f = corners_found + [(next_pos)]
-                successors.append(((next_pos,new_c_f) , action, cost))  
+                successors.append(((next_pos,new_c_f) , action, cost)) 
+            #Else we use the same corners list and append the sucessor 
             else:
                 successors.append(((next_pos,corners_found) , action, cost))  
 
@@ -401,7 +408,7 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py) 
-
+    "*** YOUR CODE HERE ***"
     #select the corners that havent been visited
     corners_unvisited = []
     
@@ -411,19 +418,19 @@ def cornersHeuristic(state, problem):
     #print('c',corners_unvisited)
 
 
-    "*** YOUR CODE HERE ***"
-    h=0
-    ideal_pos = state[0]
-    while len(corners_unvisited)>0:
+    
+    h=0#Init heuristic
+    ideal_pos = state[0]#First position current  unvisited corners 
+    while len(corners_unvisited)>0:#Iterate over our corners
         h_c = []
-        x,y = ideal_pos
-        for i in corners_unvisited:
-            x_c , y_c = i
+        x,y = ideal_pos#extract x, y coordinated
+        for i in corners_unvisited: #Iterate over the unvisited corners
+            x_c , y_c = i #extract x,y coord
             h_c.append(abs(x-x_c) + abs(y-y_c))#manhattan distance for each corner
-        h = h+ (min(h_c))
+        h = h+ (min(h_c))#Add the min distance to h 
         ind = h_c.index(min(h_c))
-        ideal_pos = corners_unvisited[ind]
-        del corners_unvisited[ind]
+        ideal_pos = corners_unvisited[ind] #Select the ideal_corner to be the ideal_pos. To be able to compute its distance to others corners
+        del corners_unvisited[ind]#Delete ideal corner from unvisited corners
 
     return h 
 
@@ -521,7 +528,7 @@ def foodHeuristic(state, problem):
 
     "*** YOUR CODE HERE ***"
     
-    position, foodGrid = state
+    position, foodGrid = state#Select current pos and foodgrid
     food_coord = foodGrid.asList() # These are the food coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py) 
 
@@ -532,9 +539,10 @@ def foodHeuristic(state, problem):
     if len(food_coord) == 0:
         return 0
     
-    h=0
-    ideal_pos = state[0]
-    while len(food_unvisited)>0:
+    h=0#init_ heuristic
+    ideal_pos = position #First point to be evaluated, current position
+    ##Same operations as cornerHeuristic. Change distance measurement and min--> max
+    while len(food_unvisited)>0:#Iterate over our corners
         h_c = []
         x,y = ideal_pos
         for i in food_unvisited:
@@ -546,7 +554,7 @@ def foodHeuristic(state, problem):
         del food_unvisited[ind]
 
         
-    return h/len(food_coord) 
+    return h/len(food_coord) #Return de average for all the food coordinated
     
     
     
@@ -626,9 +634,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
 
-        #pdb.set_trace()
-
-        #Try with mazedistance and mabhatan distance
+        #pdb.set_trace()        
 
         path = search.breadthFirstSearch(problem)#Search for the closest nodes
         return path
