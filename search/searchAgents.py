@@ -542,7 +542,7 @@ def foodHeuristic(state, problem):
     h=0#init_ heuristic
     ideal_pos = position #First point to be evaluated, current position
     ##Same operations as cornerHeuristic. Change distance measurement and min--> max
-    while len(food_unvisited)>0:#Iterate over our corners
+    while len(food_unvisited)>0:#Iterate over our food list
         h_c = []
         x,y = ideal_pos
         for i in food_unvisited:
@@ -634,7 +634,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
         "*** YOUR CODE HERE ***"
 
-        #pdb.set_trace()        
+        #pdb.set_trace( )       
 
         path = search.breadthFirstSearch(problem)#Search for the closest nodes
         return path
